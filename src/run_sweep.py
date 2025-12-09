@@ -168,7 +168,7 @@ def main() -> None:
         learning_rate=1e-3,
         weight_decay=1e-4,
         max_grad_norm=1.0,
-        num_epochs=3,    # short runs so sweep is fast
+        num_epochs=20,    # short runs so sweep is fast
         batch_size=512,
     )
 

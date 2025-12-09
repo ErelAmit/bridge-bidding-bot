@@ -1,0 +1,4 @@
+optimizer,hidden_dim,num_layers,dropout,use_batchnorm,learning_rate,weight_decay,max_grad_norm,num_epochs,batch_size,best_val_loss,best_val_acc
+adamw,256,3,0.0,False,0.001,0.0001,1.0,3,512,0.8960342007637024,0.66425
+adamw,256,3,0.2,True,0.001,0.0001,1.0,3,512,0.8345499267578125,0.6825
+sgd,256,3,0.2,True,0.001,0.0001,1.0,3,512,2.076421915245056,0.39965

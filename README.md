@@ -37,6 +37,9 @@ The system takes a 104 dimensional binary feature vector representing a North So
    - Evaluate all models and baselines on IMP metrics and print a comparison table
 
 ## Video Links
+[Download or play demo video](videos/project_demo.mp4)
+
+[Download or play technical walkthrough video](videos/technical_walkthrough.mp4)
 
 ## Evaluation
 

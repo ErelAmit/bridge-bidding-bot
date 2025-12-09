@@ -118,3 +118,71 @@ class BridgeBiddingDataset(Dataset):
         x = self.features[idx]
         y = self.labels[idx]
         return x, y
+
+class BridgeBiddingImpsDataset(Dataset):
+    """
+    Dataset that returns (features, cost_vector) for IMP based training.
+
+    - features: tensor of shape [104]
+    - cost_vector: tensor of shape [36], IMP loss for each possible action
+    """
+
+    def __init__(self, data_root: str | Path, split: str = "train") -> None:
+        super().__init__()
+        data_root = Path(data_root)
+
+        if split not in {"train", "validate", "test"}:
+            raise ValueError(f"Unknown split: {split}")
+
+        data_path = data_root / f"data_{split}.mat"
+        cost_path = data_root / f"cost_{split}.mat"
+
+        if not data_path.exists():
+            raise FileNotFoundError(f"Missing {data_path}")
+        if not cost_path.exists():
+            raise FileNotFoundError(f"Missing {cost_path}")
+
+        # Load .mat files
+        data_mat = loadmat(data_path)
+        cost_mat = loadmat(cost_path)
+
+        # Pick main arrays (first non magic key with a NumPy array)
+        def pick_main_array(mat_dict: dict, path_str: str) -> np.ndarray:
+            keys = [k for k in mat_dict.keys() if not k.startswith("__")]
+            if not keys:
+                raise KeyError(f"No data keys found in {path_str}")
+            arr = mat_dict[keys[0]]
+            if not isinstance(arr, np.ndarray):
+                raise TypeError(
+                    f"Key {keys[0]} in {path_str} is not a NumPy array"
+                )
+            return arr
+
+        data_np = pick_main_array(data_mat, str(data_path))  # shape [104, N]
+        cost_np = pick_main_array(cost_mat, str(cost_path))  # shape [36, N]
+
+        if data_np.shape[1] != cost_np.shape[1]:
+            raise ValueError(
+                f"Feature and cost arrays have different number of examples: "
+                f"{data_np.shape[1]} vs {cost_np.shape[1]}"
+            )
+
+        # Transpose so that axis 0 is example index
+        # data_np: [104, N] -> [N, 104]
+        # cost_np: [36, N] -> [N, 36]
+        data_np = data_np.T
+        cost_np = cost_np.T
+
+        # Convert to tensors
+        self.features: torch.Tensor = torch.from_numpy(data_np).float()
+        self.costs: torch.Tensor = torch.from_numpy(cost_np).float()
+
+        self.num_examples = self.features.shape[0]
+
+    def __len__(self) -> int:
+        return self.num_examples
+
+    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
+        x = self.features[idx]   # [104]
+        c = self.costs[idx]      # [36], IMP losses for each action
+        return x, c

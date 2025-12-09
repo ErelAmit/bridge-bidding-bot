@@ -204,7 +204,7 @@ def main() -> None:
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
-    num_epochs = 50
+    num_epochs = 20
     best_val_regret = float("inf")
     best_path = models_dir / "attn_rnn_imps.pt"
 

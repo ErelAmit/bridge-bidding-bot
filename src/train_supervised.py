@@ -202,7 +202,7 @@ def main() -> None:
     # Gradient clipping config
     max_grad_norm = 1.0
 
-    num_epochs = 5
+    num_epochs = 20
     best_val_acc = 0.0
     best_path = models_dir / "mlp_baseline.pt"
 
